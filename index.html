@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <div  class="container pt-5">
+            <h2>記帳系統</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>金額</th>
+                        <th>備註</th>
+                        <th>功能</th>
+                    </tr>
+                </thead>
+                <tbody  id="app" >
+                    <tr v-for ="(item , index) in items">
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.money }}</td>
+                        <td>{{ item.remark }}</td>
+                        <td><Button v-on:click = "deleteData(index)">刪除</Button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <script>
+            
+            const { createApp } = Vue
+
+            
+
+            $(function(){
+                let a = createApp({
+                    data() {
+                        return {items: [{ date: '2023/06/05' , money: "122$" , remark:""}, 
+                                { date: '2023/06/05' , money: "123$", remark:"" },
+                                { date: '2023/06/05' , money: "422$", remark:"" }]}
+                    },
+                    methods:{
+                        deleteData(index){
+                            
+                            this.items.splice(index, 1)
+                            //console.log(this.items)
+
+                            datas =  this.items
+
+                            $.ajax({
+                                type: "POST",
+                                url: "writeDatas.php",
+                                dataType: "text",
+                                data: {"datas": datas},
+                                success: function (datas) {
+                                    alert(datas)
+                                },
+                                error: function (thrownError) {
+                                    console.log(thrownError);
+                                }
+                            });
+
+                            
+                        }
+                    }
+                }).mount('#app')
+
+                $.ajax({
+                    type: "POST",
+                    url: "readDatas.php",
+                    dataType: "json",
+                    success: function (datas) {
+                        a.items = datas
+                    },
+                    error: function (thrownError) {
+                        console.log(thrownError);
+                    }
+                });
+
+            })  
+
+        </script>
+
+
+    </body>
+</html>
